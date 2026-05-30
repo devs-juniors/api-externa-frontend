@@ -1,0 +1,101 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1 class="page-title">Ações</h1>
+    <a class="btn btn-primary" routerLink="/acoes/nova">Cadastrar Ação</a>
+  </div>
+
+  <div class="search-bar">
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Buscar por ticker ou nome da empresa..."
+      [value]="searchQuery()"
+      (input)="onSearch($event)"
+      aria-label="Buscar ações"
+    />
+  </div>
+
+  @if (carregando()) {
+    <app-loading-spinner />
+  } @else {
+    <div class="card">
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th class="col-num">Nº</th>
+              <th>Ticker</th>
+              <th>Nome Empresa</th>
+              <th>Mercado</th>
+              <th>Moeda</th>
+              <th class="col-valor">Cotação Atual</th>
+              <th>Data Cotação</th>
+              <th class="col-acoes">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (paginadas().length === 0) {
+              <tr>
+                <td colspan="8" class="empty-state">Nenhuma ação encontrada.</td>
+              </tr>
+            } @else {
+              @for (acao of paginadas(); track acao.id; let i = $index) {
+                <tr>
+                  <td class="col-num">{{ indiceGlobal(i) }}</td>
+                  <td><strong class="ticker">{{ acao.ticker }}</strong></td>
+                  <td>{{ acao.nomeEmpresa }}</td>
+                  <td>
+                    <span class="badge-mercado" [class.badge-br]="acao.mercado === 'BR'" [class.badge-eua]="acao.mercado === 'EUA'">
+                      {{ acao.mercado }}
+                    </span>
+                  </td>
+                  <td>{{ acao.moeda }}</td>
+                  <td class="col-valor">{{ formatarCotacao(acao) }}</td>
+                  <td class="col-data">{{ formatarDataHora(acao.dataHoraCotacao) }}</td>
+                  <td class="col-acoes">
+                    <button
+                      class="btn btn-outline btn-sm"
+                      [disabled]="atualizandoId() === acao.id"
+                      (click)="atualizarCotacao(acao)"
+                    >
+                      @if (atualizandoId() === acao.id) {
+                        Atualizando...
+                      } @else {
+                        Atualizar Cotação
+                      }
+                    </button>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (totalPages() > 1) {
+        <div class="pagination" role="navigation" aria-label="Paginação">
+          <button
+            class="btn btn-page"
+            [disabled]="currentPage() === 1"
+            (click)="currentPage.set(currentPage() - 1)"
+            aria-label="Página anterior"
+          >‹</button>
+          @for (page of pages(); track page) {
+            <button
+              class="btn btn-page"
+              [class.active]="page === currentPage()"
+              (click)="currentPage.set(page)"
+              [attr.aria-current]="page === currentPage() ? 'page' : null"
+            >{{ page }}</button>
+          }
+          <button
+            class="btn btn-page"
+            [disabled]="currentPage() === totalPages()"
+            (click)="currentPage.set(currentPage() + 1)"
+            aria-label="Próxima página"
+          >›</button>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,253 @@
+.page-container {
+  padding: 32px 24px;
+  max-width: 1100px;
+}
+
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 24px;
+}
+
+/* ── Empty state (no query param) ── */
+.empty-state-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 80px 24px;
+  text-align: center;
+}
+
+.empty-state-msg {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+
+/* ── Filter tabs ── */
+.filtros {
+  display: flex;
+  gap: 0;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.filtro-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  background: none;
+  cursor: pointer;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+.filtro-btn:hover:not(.ativo) {
+  color: var(--color-text);
+}
+
+.filtro-btn.ativo {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.filtro-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background-color: #e0e0e0;
+  color: var(--color-text-secondary);
+}
+
+.filtro-btn.ativo .filtro-count {
+  background-color: rgba(26, 35, 126, 0.12);
+  color: var(--color-primary);
+}
+
+.filtro-count.compra {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.filtro-count.venda {
+  background-color: #fdecea;
+  color: #c62828;
+}
+
+/* ── Card / Table ── */
+.card {
+  background-color: var(--color-white);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.table thead tr {
+  background-color: #f0f2ff;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr:hover {
+  background-color: #fafbff;
+}
+
+.col-num {
+  width: 80px;
+  text-align: center;
+}
+
+.col-valor {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.col-data {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.ticker {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-primary);
+}
+
+/* ── Tipo badge ── */
+.badge-tipo {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.badge-tipo.compra {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.badge-tipo.venda {
+  background-color: #fdecea;
+  color: #c62828;
+}
+
+/* ── Empty state (table) ── */
+.empty-state {
+  text-align: center;
+  padding: 48px 16px !important;
+  color: var(--color-text-secondary);
+  font-size: 0.9375rem;
+}
+
+/* ── Pagination ── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 150ms ease;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.btn-primary:hover {
+  background-color: #283593;
+}
+
+.btn-page {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background-color: var(--color-white);
+  color: var(--color-text);
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.btn-page:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.btn-page.active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.btn-page:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

@@ -1,0 +1,104 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1 class="page-title">Corretoras</h1>
+    <a class="btn btn-primary" routerLink="/corretoras/nova">Cadastrar Corretora</a>
+  </div>
+
+  <div class="search-bar">
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Buscar por CNPJ ou Razão Social..."
+      [value]="searchQuery()"
+      (input)="onSearch($event)"
+      aria-label="Buscar corretoras"
+    />
+  </div>
+
+  @if (carregando()) {
+    <app-loading-spinner />
+  } @else {
+    <div class="card">
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th class="col-num">Nº</th>
+              <th>CNPJ</th>
+              <th>Razão Social</th>
+              <th>Cidade</th>
+              <th class="col-uf">UF</th>
+              <th>Situação</th>
+              <th class="col-acoes">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (paginadas().length === 0) {
+              <tr>
+                <td colspan="7" class="empty-state">Nenhuma corretora encontrada.</td>
+              </tr>
+            } @else {
+              @for (c of paginadas(); track c.id; let i = $index) {
+                <tr>
+                  <td class="col-num">{{ indiceGlobal(i) }}</td>
+                  <td class="col-cnpj">{{ formatarCnpj(c.cnpj) }}</td>
+                  <td>{{ c.razaoSocial }}</td>
+                  <td>{{ c.cidade }}</td>
+                  <td class="col-uf">{{ c.uf }}</td>
+                  <td>
+                    <div class="situacao">
+                      <span
+                        class="situacao-dot"
+                        [class.ativa]="c.situacaoCadastral === 'ATIVA'"
+                        [attr.aria-label]="c.situacaoCadastral"
+                      ></span>
+                      {{ c.situacaoCadastral }}
+                    </div>
+                  </td>
+                  <td class="col-acoes">
+                    <button
+                      class="btn btn-icon"
+                      title="Ver detalhes"
+                      aria-label="Ver detalhes de {{ c.razaoSocial }}"
+                      (click)="irParaDetalhe(c.id)"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 20h9"/>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 9.5-9.5z"/>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (totalPages() > 1) {
+        <div class="pagination" role="navigation" aria-label="Paginação">
+          <button
+            class="btn btn-page"
+            [disabled]="currentPage() === 1"
+            (click)="currentPage.set(currentPage() - 1)"
+            aria-label="Página anterior"
+          >‹</button>
+          @for (page of pages(); track page) {
+            <button
+              class="btn btn-page"
+              [class.active]="page === currentPage()"
+              (click)="currentPage.set(page)"
+              [attr.aria-current]="page === currentPage() ? 'page' : null"
+            >{{ page }}</button>
+          }
+          <button
+            class="btn btn-page"
+            [disabled]="currentPage() === totalPages()"
+            (click)="currentPage.set(currentPage() + 1)"
+            aria-label="Próxima página"
+          >›</button>
+        </div>
+      }
+    </div>
+  }
+</div>

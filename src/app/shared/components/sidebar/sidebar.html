@@ -1,0 +1,27 @@
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <span class="logo-text">Gestão de Ações</span>
+  </div>
+
+  <nav class="sidebar-nav" aria-label="Navegação principal">
+    @for (item of navItems; track item.route) {
+      <a
+        class="nav-item"
+        [routerLink]="item.route"
+        routerLinkActive="nav-item--active"
+        [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+      >
+        <span class="nav-icon" aria-hidden="true">{{ item.icon }}</span>
+        <span class="nav-label">{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="avatar" aria-hidden="true">GA</div>
+    <div class="sidebar-footer-info">
+      <span class="footer-name">Gestão de Ações</span>
+      <span class="footer-role">Sistema</span>
+    </div>
+  </div>
+</aside>

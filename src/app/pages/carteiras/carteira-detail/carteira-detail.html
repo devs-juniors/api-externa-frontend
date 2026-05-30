@@ -1,0 +1,230 @@
+<div class="page-container">
+  @if (carregando()) {
+    <div class="spinner-container" aria-label="Carregando...">
+      <div class="spinner"></div>
+    </div>
+  } @else if (carteira()) {
+    <nav class="breadcrumb" aria-label="Caminho de navegação">
+      <a class="breadcrumb-link" routerLink="/dashboard">Início</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a class="breadcrumb-link" routerLink="/carteiras">Carteiras</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">{{ carteira()!.nome }}</span>
+    </nav>
+
+    <h1 class="page-title">
+      {{ carteira()!.nome }}
+      <span class="title-corretora">— {{ carteira()!.nomeCorretora }}</span>
+    </h1>
+
+    <div class="page-header">
+      <div class="summary-grid">
+        <div class="summary-card">
+          <span class="summary-label">Total de Posições</span>
+          <span class="summary-value">{{ totalPosicoes() }}</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">Valor Total Investido</span>
+          <span class="summary-value">{{ formatarMoeda(valorTotalInvestido()) }}</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">Lucro / Prejuízo Total</span>
+          <span
+            class="summary-value"
+            [class.positivo]="lucroTotal() >= 0"
+            [class.negativo]="lucroTotal() < 0"
+          >
+            {{ formatarMoeda(lucroTotal()) }}
+          </span>
+        </div>
+      </div>
+      <button class="btn btn-success" (click)="abrirNovaCompra()">+ Comprar Ação</button>
+    </div>
+
+    <div class="card">
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Ticker</th>
+              <th>Nome Empresa</th>
+              <th>Mercado</th>
+              <th class="col-num">Qtd.</th>
+              <th class="col-num">Preço Médio</th>
+              <th class="col-num">Val. Investido</th>
+              <th class="col-num">Cotação Atual</th>
+              <th class="col-num">Lucro / Prejuízo</th>
+              <th class="col-num">Variação %</th>
+              <th class="col-acoes">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (carteira()!.posicoes.length === 0) {
+              <tr>
+                <td colspan="10" class="empty-state">
+                  Nenhuma posição nesta carteira.
+                </td>
+              </tr>
+            } @else {
+              @for (posicao of carteira()!.posicoes; track posicao.id) {
+                <tr>
+                  <td><strong>{{ posicao.ticker }}</strong></td>
+                  <td>{{ posicao.nomeEmpresa }}</td>
+                  <td>{{ posicao.mercado }}</td>
+                  <td class="col-num">{{ posicao.quantidadeAtual }}</td>
+                  <td class="col-num">{{ formatarMoeda(posicao.precoMedioCompra) }}</td>
+                  <td class="col-num">{{ formatarMoeda(posicao.valorTotalInvestido) }}</td>
+                  <td class="col-num">{{ formatarMoeda(posicao.cotacaoAtual) }}</td>
+                  <td
+                    class="col-num"
+                    [class.positivo]="posicao.lucroOuPrejuizo >= 0"
+                    [class.negativo]="posicao.lucroOuPrejuizo < 0"
+                  >
+                    {{ formatarMoeda(posicao.lucroOuPrejuizo) }}
+                  </td>
+                  <td
+                    class="col-num variacao"
+                    [class.positivo]="posicao.percentualVariacao >= 0"
+                    [class.negativo]="posicao.percentualVariacao < 0"
+                  >
+                    {{ posicao.percentualVariacao >= 0 ? '↑' : '↓' }}
+                    {{ formatarPercentual(posicao.percentualVariacao) }}
+                  </td>
+                  <td class="col-acoes">
+                    <div class="btn-group">
+                      <button
+                        class="btn btn-success btn-sm"
+                        (click)="abrirComprar(posicao)"
+                      >
+                        Comprar
+                      </button>
+                      <button
+                        class="btn btn-danger btn-sm"
+                        (click)="abrirVender(posicao)"
+                      >
+                        Vender
+                      </button>
+                      <button
+                        class="btn btn-outline btn-sm"
+                        (click)="verOperacoes(posicao.id)"
+                      >
+                        Ver Operações
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  } @else {
+    <div class="empty-state-page">Carteira não encontrada.</div>
+  }
+</div>
+
+@if (modalAberto()) {
+  <div
+    class="modal-overlay"
+    role="dialog"
+    [attr.aria-labelledby]="'modal-title'"
+    aria-modal="true"
+    (click)="fecharModal()"
+  >
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title">
+          @if (modalAberto() === 'nova-compra') {
+            Registrar Compra
+          } @else if (modalAberto() === 'comprar') {
+            Registrar Compra — {{ posicaoModal()!.ticker }}
+          } @else {
+            Registrar Venda — {{ posicaoModal()!.ticker }}
+          }
+        </h2>
+        <button class="modal-close" (click)="fecharModal()" aria-label="Fechar">✕</button>
+      </div>
+
+      <div class="modal-body">
+        @if (modalAberto() === 'nova-compra') {
+          <div class="form-group">
+            <label class="label" for="modal-ticker">Ticker</label>
+            <input
+              id="modal-ticker"
+              type="text"
+              class="input"
+              placeholder="Ex.: PETR4"
+              [value]="modalTicker()"
+              (input)="onTickerChange($event)"
+              style="text-transform: uppercase;"
+            />
+          </div>
+        }
+        @if (modalAberto() === 'vender') {
+          <p class="disponivel">
+            Disponível: <strong>{{ posicaoModal()!.quantidadeAtual }} ações</strong>
+          </p>
+        }
+
+        <div class="form-group">
+          <label class="label" for="modal-qtd">Quantidade</label>
+          <input
+            id="modal-qtd"
+            type="number"
+            class="input"
+            min="1"
+            [attr.max]="modalAberto() === 'vender' ? posicaoModal()!.quantidadeAtual : null"
+            placeholder="0"
+            [value]="modalQuantidade()"
+            (input)="onQuantidadeChange($event)"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="label" for="modal-preco">Preço Unitário (R$)</label>
+          <input
+            id="modal-preco"
+            type="number"
+            class="input"
+            min="0.01"
+            step="0.01"
+            placeholder="0,00"
+            [value]="modalPreco()"
+            (input)="onPrecoChange($event)"
+          />
+        </div>
+
+        <div class="modal-total">
+          <span>Total calculado:</span>
+          <strong>{{ formatarMoeda(modalTotal()) }}</strong>
+        </div>
+
+        @if (modalErro()) {
+          <div class="error-box" role="alert">{{ modalErro() }}</div>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="fecharModal()">Cancelar</button>
+        @if (modalAberto() === 'comprar' || modalAberto() === 'nova-compra') {
+          <button
+            class="btn btn-success"
+            [disabled]="modalEnviando()"
+            (click)="confirmarCompra()"
+          >
+            @if (modalEnviando()) { Registrando... } @else { Confirmar Compra }
+          </button>
+        } @else {
+          <button
+            class="btn btn-danger"
+            [disabled]="modalEnviando()"
+            (click)="confirmarVenda()"
+          >
+            @if (modalEnviando()) { Registrando... } @else { Confirmar Venda }
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+}

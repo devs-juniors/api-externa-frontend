@@ -1,0 +1,115 @@
+<div class="page-container">
+  <h1 class="page-title">Operações</h1>
+
+  @if (!carteiraAcaoId()) {
+    <div class="empty-state-page">
+      <p class="empty-state-msg">Selecione uma carteira para ver as operações.</p>
+      <a class="btn btn-primary" routerLink="/carteiras">Ir para Carteiras</a>
+    </div>
+  } @else if (carregando()) {
+    <app-loading-spinner />
+  } @else {
+    <div class="filtros" role="tablist" aria-label="Filtrar operações">
+      <button
+        class="filtro-btn"
+        role="tab"
+        [class.ativo]="filtroAtivo() === 'todas'"
+        [attr.aria-selected]="filtroAtivo() === 'todas'"
+        (click)="setFiltro('todas')"
+      >
+        Todas
+        <span class="filtro-count">{{ operacoes().length }}</span>
+      </button>
+      <button
+        class="filtro-btn"
+        role="tab"
+        [class.ativo]="filtroAtivo() === 'compras'"
+        [attr.aria-selected]="filtroAtivo() === 'compras'"
+        (click)="setFiltro('compras')"
+      >
+        Compras
+        <span class="filtro-count compra">{{ operacoes().length - operacoes().filter(o => o.tipo === 'VENDA').length }}</span>
+      </button>
+      <button
+        class="filtro-btn"
+        role="tab"
+        [class.ativo]="filtroAtivo() === 'vendas'"
+        [attr.aria-selected]="filtroAtivo() === 'vendas'"
+        (click)="setFiltro('vendas')"
+      >
+        Vendas
+        <span class="filtro-count venda">{{ operacoes().filter(o => o.tipo === 'VENDA').length }}</span>
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th class="col-num">Nº</th>
+              <th>Ticker</th>
+              <th>Tipo</th>
+              <th class="col-num">Quantidade</th>
+              <th class="col-valor">Preço Unitário</th>
+              <th class="col-valor">Valor Total</th>
+              <th>Data Operação</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (paginadas().length === 0) {
+              <tr>
+                <td colspan="7" class="empty-state">Nenhuma operação encontrada.</td>
+              </tr>
+            } @else {
+              @for (op of paginadas(); track op.id; let i = $index) {
+                <tr>
+                  <td class="col-num">{{ indiceGlobal(i) }}</td>
+                  <td><strong class="ticker">{{ op.ticker }}</strong></td>
+                  <td>
+                    <span
+                      class="badge-tipo"
+                      [class.compra]="op.tipo === 'COMPRA'"
+                      [class.venda]="op.tipo === 'VENDA'"
+                    >
+                      {{ op.tipo }}
+                    </span>
+                  </td>
+                  <td class="col-num">{{ op.quantidade }}</td>
+                  <td class="col-valor">{{ op.precoUnitario | currencyBr }}</td>
+                  <td class="col-valor">{{ op.valorTotal | currencyBr }}</td>
+                  <td class="col-data">{{ op.dataOperacao | dateBr }}</td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (totalPages() > 1) {
+        <div class="pagination" role="navigation" aria-label="Paginação">
+          <button
+            class="btn btn-page"
+            [disabled]="currentPage() === 1"
+            (click)="currentPage.set(currentPage() - 1)"
+            aria-label="Página anterior"
+          >‹</button>
+          @for (page of pages(); track page) {
+            <button
+              class="btn btn-page"
+              [class.active]="page === currentPage()"
+              (click)="currentPage.set(page)"
+              [attr.aria-current]="page === currentPage() ? 'page' : null"
+            >{{ page }}</button>
+          }
+          <button
+            class="btn btn-page"
+            [disabled]="currentPage() === totalPages()"
+            (click)="currentPage.set(currentPage() + 1)"
+            aria-label="Próxima página"
+          >›</button>
+        </div>
+      }
+    </div>
+  }
+</div>

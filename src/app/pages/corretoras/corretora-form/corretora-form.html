@@ -1,0 +1,44 @@
+<div class="page-container">
+  <app-breadcrumb [items]="breadcrumb" />
+
+  <h1 class="page-title">Nova Corretora</h1>
+
+  <div class="card form-card">
+    @if (sucesso()) {
+      <div class="success-box" role="status">
+        Corretora cadastrada com sucesso! Redirecionando...
+      </div>
+    } @else {
+      <div class="form-group">
+        <label class="label" for="cnpj">
+          CNPJ <span class="required" aria-hidden="true">*</span>
+        </label>
+        <input
+          id="cnpj"
+          type="text"
+          class="input"
+          placeholder="00.000.000/0000-00"
+          inputmode="numeric"
+          [value]="cnpjFormatado()"
+          (input)="onCnpjInput($event)"
+          autocomplete="off"
+          maxlength="18"
+        />
+        <p class="helper-text">
+          Os dados serão preenchidos automaticamente via Receita Federal.
+        </p>
+      </div>
+
+      @if (erro()) {
+        <div class="error-box" role="alert">{{ erro() }}</div>
+      }
+
+      <div class="form-actions">
+        <a class="btn btn-secondary" routerLink="/corretoras">Cancelar</a>
+        <button class="btn btn-primary" [disabled]="enviando()" (click)="cadastrar()">
+          @if (enviando()) { Cadastrando... } @else { Cadastrar }
+        </button>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,55 @@
+<div class="page-container">
+  <app-breadcrumb [items]="breadcrumb" />
+
+  <h1 class="page-title">Nova Ação</h1>
+
+  <div class="card form-card">
+    @if (sucesso()) {
+      <div class="success-box" role="status">
+        Ação cadastrada com sucesso! Redirecionando...
+      </div>
+    } @else {
+      <div class="form-group">
+        <label class="label" for="ticker">
+          Ticker <span class="required" aria-hidden="true">*</span>
+        </label>
+        <input
+          id="ticker"
+          type="text"
+          class="input input-ticker"
+          placeholder="Ex.: PETR4"
+          [value]="ticker()"
+          (input)="onTickerInput($event)"
+          autocomplete="off"
+          maxlength="10"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="label" for="mercado">
+          Mercado <span class="required" aria-hidden="true">*</span>
+        </label>
+        <select
+          id="mercado"
+          class="select"
+          [value]="mercado()"
+          (change)="onMercadoChange($event)"
+        >
+          <option value="BR">BR — Bolsa do Brasil (B3)</option>
+          <option value="EUA">EUA — Bolsa dos Estados Unidos</option>
+        </select>
+      </div>
+
+      @if (erro()) {
+        <div class="error-box" role="alert">{{ erro() }}</div>
+      }
+
+      <div class="form-actions">
+        <a class="btn btn-secondary" routerLink="/acoes">Cancelar</a>
+        <button class="btn btn-primary" [disabled]="enviando()" (click)="cadastrar()">
+          @if (enviando()) { Cadastrando... } @else { Cadastrar }
+        </button>
+      </div>
+    }
+  </div>
+</div>

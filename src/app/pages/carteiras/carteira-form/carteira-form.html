@@ -1,0 +1,60 @@
+<div class="page-container">
+  <nav class="breadcrumb" aria-label="Caminho de navegação">
+    <a class="breadcrumb-link" routerLink="/dashboard">Início</a>
+    <span class="breadcrumb-sep" aria-hidden="true">/</span>
+    <a class="breadcrumb-link" routerLink="/carteiras">Carteiras</a>
+    <span class="breadcrumb-sep" aria-hidden="true">/</span>
+    <span class="breadcrumb-current">Nova Carteira</span>
+  </nav>
+
+  <h1 class="page-title">Nova Carteira</h1>
+
+  <div class="card form-card">
+    <div class="form-group">
+      <label class="label" for="nome">
+        Nome da Carteira <span class="required" aria-hidden="true">*</span>
+      </label>
+      <input
+        id="nome"
+        type="text"
+        class="input"
+        placeholder="Ex.: Carteira Longo Prazo"
+        [value]="nome()"
+        (input)="onNomeChange($event)"
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="form-group">
+      <label class="label" for="corretora">
+        Corretora <span class="required" aria-hidden="true">*</span>
+      </label>
+      <select
+        id="corretora"
+        class="select"
+        [value]="corretoraId() ?? ''"
+        (change)="onCorretoraChange($event)"
+      >
+        <option value="">Selecione uma corretora...</option>
+        @for (c of corretoras(); track c.id) {
+          <option [value]="c.id">{{ c.razaoSocial }}</option>
+        }
+      </select>
+    </div>
+
+    @if (erro()) {
+      <div class="error-box" role="alert">{{ erro() }}</div>
+    }
+
+    <div class="form-actions">
+      <a class="btn btn-secondary" routerLink="/carteiras">Cancelar</a>
+      <button class="btn btn-primary" [disabled]="enviando()" (click)="criar()">
+        @if (enviando()) {
+          Criando...
+        } @else {
+          Criar Carteira
+        }
+      </button>
+    </div>
+  </div>
+</div>

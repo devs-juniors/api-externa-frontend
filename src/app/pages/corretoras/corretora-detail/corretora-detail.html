@@ -1,0 +1,110 @@
+<div class="page-container">
+  @if (carregando()) {
+    <app-loading-spinner />
+  } @else if (corretora()) {
+    <div class="page-header">
+      <div>
+        <app-breadcrumb [items]="breadcrumb()" />
+        <h1 class="page-title">{{ corretora()!.razaoSocial }}</h1>
+      </div>
+      <a class="btn btn-secondary" routerLink="/corretoras">← Voltar</a>
+    </div>
+
+    <div class="info-grid">
+      <!-- Card 1: Dados Cadastrais -->
+      <div class="info-card">
+        <h2 class="info-card-title">Dados Cadastrais</h2>
+        <dl class="info-list">
+          <div class="info-item">
+            <dt class="info-label">CNPJ</dt>
+            <dd class="info-value">{{ formatarCnpj(corretora()!.cnpj) }}</dd>
+          </div>
+          <div class="info-item">
+            <dt class="info-label">Razão Social</dt>
+            <dd class="info-value">{{ corretora()!.razaoSocial }}</dd>
+          </div>
+          <div class="info-item">
+            <dt class="info-label">Nome Fantasia</dt>
+            <dd class="info-value">{{ corretora()!.nomeFantasia || '—' }}</dd>
+          </div>
+          <div class="info-item">
+            <dt class="info-label">Situação</dt>
+            <dd class="info-value">
+              <div class="situacao">
+                <span class="situacao-dot" [class.ativa]="corretora()!.situacaoCadastral === 'ATIVA'"></span>
+                {{ corretora()!.situacaoCadastral }}
+              </div>
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Card 2: Contato -->
+      <div class="info-card">
+        <h2 class="info-card-title">Contato</h2>
+        <dl class="info-list">
+          <div class="info-item">
+            <dt class="info-label">E-mail</dt>
+            <dd class="info-value">{{ corretora()!.email || '—' }}</dd>
+          </div>
+          <div class="info-item">
+            <dt class="info-label">Telefone</dt>
+            <dd class="info-value">{{ corretora()!.telefone || '—' }}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Card 3: Endereço -->
+      <div class="info-card">
+        <h2 class="info-card-title">Endereço</h2>
+        <dl class="info-list">
+          <div class="info-item">
+            <dt class="info-label">CEP</dt>
+            <dd class="info-value">{{ corretora()!.cep || '—' }}</dd>
+          </div>
+          <div class="info-item">
+            <dt class="info-label">Logradouro</dt>
+            <dd class="info-value">
+              {{ corretora()!.logradouro || '—' }}
+              @if (corretora()!.numero) { , nº {{ corretora()!.numero }} }
+              @if (corretora()!.complemento) { — {{ corretora()!.complemento }} }
+            </dd>
+          </div>
+          <div class="info-item">
+            <dt class="info-label">Bairro</dt>
+            <dd class="info-value">{{ corretora()!.bairro || '—' }}</dd>
+          </div>
+          <div class="info-item">
+            <dt class="info-label">Cidade / UF</dt>
+            <dd class="info-value">{{ corretora()!.cidade || '—' }} / {{ corretora()!.uf || '—' }}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Card 4: Validação CVM -->
+      <div class="info-card">
+        <h2 class="info-card-title">Validação CVM</h2>
+        <dl class="info-list">
+          <div class="info-item">
+            <dt class="info-label">Validada na CVM</dt>
+            <dd class="info-value">
+              <span
+                class="badge"
+                [class.badge-sim]="corretora()!.validadaNaCvm"
+                [class.badge-nao]="!corretora()!.validadaNaCvm"
+              >
+                {{ corretora()!.validadaNaCvm ? 'Sim' : 'Não' }}
+              </span>
+            </dd>
+          </div>
+          <div class="info-item">
+            <dt class="info-label">Data de Cadastro</dt>
+            <dd class="info-value">{{ formatarData(corretora()!.dataCadastro) }}</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  } @else {
+    <p class="empty-state-page">Corretora não encontrada.</p>
+  }
+</div>

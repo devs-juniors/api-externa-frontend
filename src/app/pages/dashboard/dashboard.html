@@ -1,0 +1,64 @@
+<div class="page-container">
+  <h1 class="page-title">Início</h1>
+
+  <div class="cards-grid">
+    <div class="summary-card">
+      <div class="card-icon">🏢</div>
+      <div class="card-info">
+        <span class="card-label">Total de Corretoras</span>
+        <span class="card-value">
+          @if (carregando()) { <span class="skeleton">—</span> } @else { {{ totalCorretoras() }} }
+        </span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon">📈</div>
+      <div class="card-info">
+        <span class="card-label">Total de Ações</span>
+        <span class="card-value">
+          @if (carregando()) { <span class="skeleton">—</span> } @else { {{ totalAcoes() }} }
+        </span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon">💼</div>
+      <div class="card-info">
+        <span class="card-label">Total de Carteiras</span>
+        <span class="card-value">
+          @if (carregando()) { <span class="skeleton">—</span> } @else { {{ totalCarteiras() }} }
+        </span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon">📋</div>
+      <div class="card-info">
+        <span class="card-label">Sistema</span>
+        <span class="card-value status-online">
+          <span class="status-dot" aria-hidden="true"></span>
+          Online
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">Acesso Rápido</h2>
+    <div class="quick-grid">
+      <a class="quick-btn" routerLink="/corretoras/nova">
+        <span class="quick-icon" aria-hidden="true">🏢</span>
+        Cadastrar Corretora
+      </a>
+      <a class="quick-btn" routerLink="/acoes/nova">
+        <span class="quick-icon" aria-hidden="true">📈</span>
+        Cadastrar Ação
+      </a>
+      <a class="quick-btn" routerLink="/carteiras/nova">
+        <span class="quick-icon" aria-hidden="true">💼</span>
+        Nova Carteira
+      </a>
+    </div>
+  </div>
+</div>
