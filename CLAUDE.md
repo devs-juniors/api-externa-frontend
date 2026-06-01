@@ -21,12 +21,41 @@ npx vitest run src/app/app.spec.ts
 Angular 21 standalone-components app (no NgModules). Entry point is `src/main.ts` → bootstraps `App` via `appConfig`.
 
 **Key conventions:**
-- Component files drop the `.component` suffix: `app.ts`, `app.html`, `app.css` (not `app.component.ts`)
-- Use Angular signals (`signal()`, `computed()`) for reactive state — not `BehaviorSubject` or plain properties
-- All components are standalone (use `imports: [...]` directly in `@Component`, not in a module)
-- Routes are declared in `src/app/app.routes.ts` and provided via `provideRouter(routes)` in `app.config.ts`
+- Component files drop the `.component` suffix: `app.ts`, `app.html`, `app.css`
+- Use Angular signals (`signal()`, `computed()`) for reactive state — not `BehaviorSubject`
+- All components are standalone (`imports: [...]` in `@Component`, not in a module)
+- Routes in `src/app/app.routes.ts`, provided via `provideRouter(routes)` in `app.config.ts`
 - Global styles in `src/styles.css`; component styles are scoped to their `.css` file
+- **Always use CSS variables — never hardcode color values**
+- **Always reuse existing CSS classes before creating new ones**
 
-**TypeScript:** strict mode is fully enabled including `noImplicitReturns`, `noPropertyAccessFromIndexSignature`, and strict Angular template checks.
+## Design System
 
-**Formatting:** Prettier with `singleQuote: true`, `printWidth: 100`, and the `angular` parser for `.html` files.
+System name: **Nexo**. Palette defined in `src/styles.css`:
+
+```
+--color-primary:       #1c1c1e   grafite escuro — sidebar, btn-primary, paginação ativa
+--color-primary-mid:   #2c2c2e   hover btn-primary, sidebar footer
+--color-primary-light: #3a3a3c   grafite claro
+--color-accent:        #00897b   verde esmeralda — destaques, botões success, input focus
+--color-accent-dark:   #00695c   hover btn-success, textos sobre accent-light
+--color-accent-light:  #e0f2f1   fundos sutis — table header, badges, card icons
+--color-bg:            #f2f2f7   fundo geral
+--color-text:          #1c1c1e
+--color-text-secondary:#6b6b6e
+--color-border:        #e0e0e0
+--color-danger:        #c62828
+```
+
+## Available Pipes
+
+- `currencyBr` — formata para BRL (R$ 1.234,56)
+- `dateBr` — formata para DD/MM/YYYY
+
+## TypeScript
+
+Strict mode: `noImplicitReturns`, `noPropertyAccessFromIndexSignature`, strict Angular template checks.
+
+## Formatting
+
+Prettier: `singleQuote: true`, `printWidth: 100`, parser `angular` para `.html`.
