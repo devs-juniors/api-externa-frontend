@@ -10,4 +10,7 @@ export interface CarteiraAcaoResponse {
   cotacaoAtual: number;
   lucroOuPrejuizo: number;
   percentualVariacao: number;
+  precoMedioVenda: number | null;
+  quantidadeVendida: number;
+  lucroMedioPorAcao: number | null;
 }

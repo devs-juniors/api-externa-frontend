@@ -22,4 +22,8 @@ export class CorretoraService {
   buscarPorCnpj(cnpj: string): Observable<Corretora> {
     return this.http.get<Corretora>(`/api/corretoras/cnpj/${cnpj}`);
   }
+
+  excluir(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/corretoras/${id}`);
+  }
 }

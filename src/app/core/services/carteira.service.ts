@@ -20,23 +20,25 @@ export class CarteiraService {
     return this.http.get<Carteira>(`/api/carteiras/${id}`);
   }
 
-  comprar(id: number, ticker: string, qtd: number, preco: number): Observable<void> {
+  comprar(id: number, ticker: string, qtd: number): Observable<void> {
     return this.http.post<void>(`/api/carteiras/${id}/comprar`, {
       ticker,
       quantidade: qtd,
-      precoUnitario: preco,
     });
   }
 
-  vender(id: number, ticker: string, qtd: number, preco: number): Observable<void> {
+  vender(id: number, ticker: string, qtd: number): Observable<void> {
     return this.http.post<void>(`/api/carteiras/${id}/vender`, {
       ticker,
       quantidade: qtd,
-      precoUnitario: preco,
     });
   }
 
   listarOperacoes(id: number): Observable<Operacao[]> {
     return this.http.get<Operacao[]>(`/api/carteiras/${id}/operacoes`);
+  }
+
+  excluir(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/carteiras/${id}`);
   }
 }

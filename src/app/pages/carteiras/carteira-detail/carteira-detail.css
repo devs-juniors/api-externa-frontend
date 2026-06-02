@@ -114,6 +114,12 @@
   font-variant-numeric: tabular-nums;
 }
 
+.summary-hint {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  margin-top: -4px;
+}
+
 /* ── Color states ── */
 .positivo { color: var(--color-success); }
 .negativo { color: var(--color-danger); }

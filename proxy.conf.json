@@ -4,5 +4,11 @@
     "secure": false,
     "changeOrigin": true,
     "pathRewrite": { "^/api": "" }
+  },
+  "/awesomeapi": {
+    "target": "https://economia.awesomeapi.com.br",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": { "^/awesomeapi": "" }
   }
 }

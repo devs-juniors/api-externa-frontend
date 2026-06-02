@@ -17,6 +17,7 @@ export class CarteiraListComponent implements OnInit {
   carregando = signal(true);
   searchQuery = signal('');
   currentPage = signal(1);
+  excluindoId = signal<number | null>(null);
   readonly pageSize = 10;
 
   filtradas = computed(() => {
@@ -52,6 +53,21 @@ export class CarteiraListComponent implements OnInit {
 
   irPara(id: number): void {
     this.router.navigate(['/carteiras', id]);
+  }
+
+  confirmarExcluir(carteira: Carteira): void {
+    if (!confirm(`Excluir a carteira "${carteira.nome}"?`)) return;
+    this.excluindoId.set(carteira.id);
+    this.carteiraService.excluir(carteira.id).subscribe({
+      next: () => {
+        this.carteiras.update((list) => list.filter((x) => x.id !== carteira.id));
+        this.excluindoId.set(null);
+      },
+      error: (err) => {
+        alert(err?.error?.message ?? 'Erro ao excluir carteira.');
+        this.excluindoId.set(null);
+      },
+    });
   }
 
   indiceGlobal(indicePagina: number): number {

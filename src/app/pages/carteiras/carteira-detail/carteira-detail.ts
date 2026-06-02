@@ -1,14 +1,17 @@
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
 import { CarteiraService } from '../../../core/services/carteira.service';
+import { CambioService } from '../../../core/services/cambio.service';
 import { Carteira } from '../../../core/models/carteira.model';
 import { CarteiraAcaoResponse } from '../../../core/models/carteira-acao.model';
+import { CurrencyBrPipe } from '../../../shared/pipes/currency-br.pipe';
 
 type TipoModal = 'comprar' | 'vender' | 'nova-compra' | null;
 
 @Component({
   selector: 'app-carteira-detail',
-  imports: [RouterLink],
+  imports: [RouterLink, CurrencyBrPipe, DecimalPipe],
   templateUrl: './carteira-detail.html',
   styleUrl: './carteira-detail.css',
   host: { '(document:keydown.escape)': 'fecharModal()' },
@@ -17,37 +20,43 @@ export class CarteiraDetailComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly carteiraService = inject(CarteiraService);
+  private readonly cambioService = inject(CambioService);
 
   carteira = signal<Carteira | null>(null);
   carregando = signal(true);
+  taxaUSD = signal<number>(1);
 
   totalPosicoes = computed(() => this.carteira()?.posicoes.length ?? 0);
+
   valorTotalInvestido = computed(() =>
-    this.carteira()?.posicoes.reduce((s, p) => s + p.valorTotalInvestido, 0) ?? 0,
+    this.carteira()?.posicoes.reduce((s, p) => {
+      const valor = p.moeda === 'USD' ? p.valorTotalInvestido * this.taxaUSD() : p.valorTotalInvestido;
+      return s + valor;
+    }, 0) ?? 0,
   );
+
   lucroTotal = computed(() =>
-    this.carteira()?.posicoes.reduce((s, p) => s + p.lucroOuPrejuizo, 0) ?? 0,
+    this.carteira()?.posicoes.reduce((s, p) => {
+      const lucro = p.moeda === 'USD' ? p.lucroOuPrejuizo * this.taxaUSD() : p.lucroOuPrejuizo;
+      return s + lucro;
+    }, 0) ?? 0,
   );
 
   modalAberto = signal<TipoModal>(null);
   posicaoModal = signal<CarteiraAcaoResponse | null>(null);
   modalQuantidade = signal('');
-  modalPreco = signal('');
   modalTicker = signal('');
   modalEnviando = signal(false);
   modalErro = signal<string | null>(null);
 
-  modalTotal = computed(() => {
-    const q = parseFloat(this.modalQuantidade());
-    const p = parseFloat(this.modalPreco());
-    return !isNaN(q) && !isNaN(p) && q > 0 && p > 0 ? q * p : 0;
-  });
+  simboloMoedaAtual = computed(() => (this.posicaoModal()?.moeda === 'USD' ? 'US$' : 'R$'));
 
   private carteiraId!: number;
 
   ngOnInit(): void {
     this.carteiraId = Number(this.route.snapshot.paramMap.get('id'));
     this.carregarCarteira();
+    this.cambioService.buscarTaxaUSDParaBRL().subscribe((taxa) => this.taxaUSD.set(taxa));
   }
 
   ngOnDestroy(): void {
@@ -69,7 +78,6 @@ export class CarteiraDetailComponent implements OnInit, OnDestroy {
     this.posicaoModal.set(null);
     this.modalTicker.set('');
     this.modalQuantidade.set('');
-    this.modalPreco.set('');
     this.modalErro.set(null);
     this.modalAberto.set('nova-compra');
     document.body.style.overflow = 'hidden';
@@ -78,7 +86,6 @@ export class CarteiraDetailComponent implements OnInit, OnDestroy {
   abrirComprar(posicao: CarteiraAcaoResponse): void {
     this.posicaoModal.set(posicao);
     this.modalQuantidade.set('');
-    this.modalPreco.set('');
     this.modalErro.set(null);
     this.modalAberto.set('comprar');
     document.body.style.overflow = 'hidden';
@@ -87,7 +94,6 @@ export class CarteiraDetailComponent implements OnInit, OnDestroy {
   abrirVender(posicao: CarteiraAcaoResponse): void {
     this.posicaoModal.set(posicao);
     this.modalQuantidade.set('');
-    this.modalPreco.set('');
     this.modalErro.set(null);
     this.modalAberto.set('vender');
     document.body.style.overflow = 'hidden';
@@ -105,10 +111,6 @@ export class CarteiraDetailComponent implements OnInit, OnDestroy {
     this.modalQuantidade.set((event.target as HTMLInputElement).value);
   }
 
-  onPrecoChange(event: Event): void {
-    this.modalPreco.set((event.target as HTMLInputElement).value);
-  }
-
   onTickerChange(event: Event): void {
     this.modalTicker.set((event.target as HTMLInputElement).value.toUpperCase());
   }
@@ -117,22 +119,21 @@ export class CarteiraDetailComponent implements OnInit, OnDestroy {
     const ticker =
       this.modalAberto() === 'nova-compra' ? this.modalTicker() : this.posicaoModal()!.ticker;
     const qtd = parseFloat(this.modalQuantidade());
-    const preco = parseFloat(this.modalPreco());
 
     if (this.modalAberto() === 'nova-compra' && !ticker.trim()) {
       this.modalErro.set('Informe o ticker da ação.');
       return;
     }
 
-    if (isNaN(qtd) || qtd <= 0 || isNaN(preco) || preco <= 0) {
-      this.modalErro.set('Informe quantidade e preço válidos.');
+    if (isNaN(qtd) || qtd <= 0) {
+      this.modalErro.set('Informe uma quantidade válida.');
       return;
     }
 
     this.modalEnviando.set(true);
     this.modalErro.set(null);
 
-    this.carteiraService.comprar(this.carteiraId, ticker, qtd, preco).subscribe({
+    this.carteiraService.comprar(this.carteiraId, ticker, qtd).subscribe({
       next: () => {
         this.fecharModal();
         this.carregarCarteira();
@@ -147,10 +148,9 @@ export class CarteiraDetailComponent implements OnInit, OnDestroy {
   confirmarVenda(): void {
     const posicao = this.posicaoModal()!;
     const qtd = parseFloat(this.modalQuantidade());
-    const preco = parseFloat(this.modalPreco());
     const maxQtd = posicao.quantidadeAtual;
 
-    if (isNaN(qtd) || qtd <= 0 || qtd > maxQtd || isNaN(preco) || preco <= 0) {
+    if (isNaN(qtd) || qtd <= 0 || qtd > maxQtd) {
       this.modalErro.set(`Quantidade inválida. Disponível: ${maxQtd} ações.`);
       return;
     }
@@ -158,7 +158,7 @@ export class CarteiraDetailComponent implements OnInit, OnDestroy {
     this.modalEnviando.set(true);
     this.modalErro.set(null);
 
-    this.carteiraService.vender(this.carteiraId, posicao.ticker, qtd, preco).subscribe({
+    this.carteiraService.vender(this.carteiraId, posicao.ticker, qtd).subscribe({
       next: () => {
         this.fecharModal();
         this.carregarCarteira();

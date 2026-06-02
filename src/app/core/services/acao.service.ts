@@ -26,4 +26,8 @@ export class AcaoService {
   atualizarCotacao(id: number): Observable<Acao> {
     return this.http.put<Acao>(`/api/acoes/${id}/atualizar-cotacao`, {});
   }
+
+  excluir(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/acoes/${id}`);
+  }
 }

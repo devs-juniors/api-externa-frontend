@@ -26,6 +26,9 @@
         <div class="summary-card">
           <span class="summary-label">Valor Total Investido</span>
           <span class="summary-value">{{ formatarMoeda(valorTotalInvestido()) }}</span>
+          @if (taxaUSD() > 1) {
+            <span class="summary-hint">USD convertido · US$ 1 = {{ taxaUSD() | number:'1.2-2' }}</span>
+          }
         </div>
         <div class="summary-card">
           <span class="summary-label">Lucro / Prejuízo Total</span>
@@ -51,9 +54,11 @@
               <th>Mercado</th>
               <th class="col-num">Qtd.</th>
               <th class="col-num">Preço Médio</th>
+              <th class="col-num">Preço Médio Venda</th>
               <th class="col-num">Val. Investido</th>
               <th class="col-num">Cotação Atual</th>
               <th class="col-num">Lucro / Prejuízo</th>
+              <th class="col-num">Lucro Médio / Ação</th>
               <th class="col-num">Variação %</th>
               <th class="col-acoes">Ações</th>
             </tr>
@@ -61,7 +66,7 @@
           <tbody>
             @if (carteira()!.posicoes.length === 0) {
               <tr>
-                <td colspan="10" class="empty-state">
+                <td colspan="12" class="empty-state">
                   Nenhuma posição nesta carteira.
                 </td>
               </tr>
@@ -72,15 +77,33 @@
                   <td>{{ posicao.nomeEmpresa }}</td>
                   <td>{{ posicao.mercado }}</td>
                   <td class="col-num">{{ posicao.quantidadeAtual }}</td>
-                  <td class="col-num">{{ formatarMoeda(posicao.precoMedioCompra) }}</td>
-                  <td class="col-num">{{ formatarMoeda(posicao.valorTotalInvestido) }}</td>
-                  <td class="col-num">{{ formatarMoeda(posicao.cotacaoAtual) }}</td>
+                  <td class="col-num">{{ posicao.precoMedioCompra | currencyBr:posicao.moeda }}</td>
+                  <td class="col-num">
+                    @if (posicao.precoMedioVenda === null || posicao.quantidadeVendida === 0) {
+                      —
+                    } @else {
+                      {{ posicao.precoMedioVenda | currencyBr:posicao.moeda }}
+                    }
+                  </td>
+                  <td class="col-num">{{ posicao.valorTotalInvestido | currencyBr:posicao.moeda }}</td>
+                  <td class="col-num">{{ posicao.cotacaoAtual | currencyBr:posicao.moeda }}</td>
                   <td
                     class="col-num"
                     [class.positivo]="posicao.lucroOuPrejuizo >= 0"
                     [class.negativo]="posicao.lucroOuPrejuizo < 0"
                   >
-                    {{ formatarMoeda(posicao.lucroOuPrejuizo) }}
+                    {{ posicao.lucroOuPrejuizo | currencyBr:posicao.moeda }}
+                  </td>
+                  <td
+                    class="col-num"
+                    [class.positivo]="posicao.lucroMedioPorAcao !== null && posicao.lucroMedioPorAcao >= 0"
+                    [class.negativo]="posicao.lucroMedioPorAcao !== null && posicao.lucroMedioPorAcao < 0"
+                  >
+                    @if (posicao.lucroMedioPorAcao === null) {
+                      —
+                    } @else {
+                      {{ posicao.lucroMedioPorAcao | currencyBr:posicao.moeda }}
+                    }
                   </td>
                   <td
                     class="col-num variacao"
@@ -181,24 +204,7 @@
           />
         </div>
 
-        <div class="form-group">
-          <label class="label" for="modal-preco">Preço Unitário (R$)</label>
-          <input
-            id="modal-preco"
-            type="number"
-            class="input"
-            min="0.01"
-            step="0.01"
-            placeholder="0,00"
-            [value]="modalPreco()"
-            (input)="onPrecoChange($event)"
-          />
-        </div>
-
-        <div class="modal-total">
-          <span>Total calculado:</span>
-          <strong>{{ formatarMoeda(modalTotal()) }}</strong>
-        </div>
+        <p class="modal-info">O preço será o da cotação atual buscado automaticamente.</p>
 
         @if (modalErro()) {
           <div class="error-box" role="alert">{{ modalErro() }}</div>

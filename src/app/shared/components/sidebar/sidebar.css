@@ -14,6 +14,16 @@
   padding: 24px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  display: flex;
+  align-items: center;
+  color: var(--color-accent);
+  flex-shrink: 0;
 }
 
 .logo-text {
@@ -21,9 +31,6 @@
   font-weight: 700;
   color: var(--color-accent);
   letter-spacing: -0.01em;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .sidebar-nav {
@@ -91,14 +98,16 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: var(--color-accent);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%);
   color: var(--color-white);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 700;
   flex-shrink: 0;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 0 2px rgba(0, 137, 123, 0.3), 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
 .sidebar-footer-info {
@@ -152,17 +161,9 @@
   .sidebar-logo {
     padding: 14px 0;
     justify-content: center;
-    display: flex;
   }
 
   .logo-text { display: none; }
-
-  .sidebar-logo::after {
-    content: '📊';
-    font-size: 1.5rem;
-    display: block;
-    text-align: center;
-  }
 
   .nav-item {
     justify-content: center;

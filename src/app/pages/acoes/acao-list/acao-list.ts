@@ -67,6 +67,23 @@ export class AcaoListComponent implements OnInit {
     });
   }
 
+  confirmarExcluir(acao: Acao): void {
+    const confirmacao = confirm(`Tem certeza que deseja excluir a ação ${acao.ticker}?`);
+    if (!confirmacao) return;
+
+    this.atualizandoId.set(acao.id);
+    this.acaoService.excluir(acao.id).subscribe({
+      next: () => {
+        this.acoes.update((list) => list.filter((a) => a.id !== acao.id));
+        this.atualizandoId.set(null);
+      },
+      error: (err) => {
+        alert(err?.error?.message ?? 'Erro ao excluir ação.');
+        this.atualizandoId.set(null);
+      },
+    });
+  }
+
   formatarCotacao(acao: Acao): string {
     const currency = acao.mercado === 'EUA' ? 'USD' : 'BRL';
     return acao.cotacaoAtual.toLocaleString('pt-BR', { style: 'currency', currency });

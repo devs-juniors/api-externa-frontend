@@ -18,6 +18,7 @@ export class CorretoraListComponent implements OnInit {
   carregando = signal(true);
   searchQuery = signal('');
   currentPage = signal(1);
+  excluindoId = signal<number | null>(null);
   readonly pageSize = 10;
 
   filtradas = computed(() => {
@@ -60,6 +61,21 @@ export class CorretoraListComponent implements OnInit {
 
   irParaDetalhe(id: number): void {
     this.router.navigate(['/corretoras', id]);
+  }
+
+  confirmarExcluir(c: Corretora): void {
+    if (!confirm(`Excluir a corretora "${c.razaoSocial}"?`)) return;
+    this.excluindoId.set(c.id);
+    this.corretoraService.excluir(c.id).subscribe({
+      next: () => {
+        this.corretoras.update((list) => list.filter((x) => x.id !== c.id));
+        this.excluindoId.set(null);
+      },
+      error: (err) => {
+        alert(err?.error?.message ?? 'Erro ao excluir corretora.');
+        this.excluindoId.set(null);
+      },
+    });
   }
 
   indiceGlobal(i: number): number {
